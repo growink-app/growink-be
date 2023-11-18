@@ -13,16 +13,64 @@ datasource db {
 model User {
   id  String @id @default(uuid())
   email String @unique
-  firstName String
-  lastName String
+  name String
   phoneNumber String
   imageUrl String?
   password String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  yields Yield[]
+  transactions Transaction[]
+
+  createdTime DateTime @default(now()) @db.Timestamptz
+  updatedTime DateTime @default(now()) @updatedAt @db.Timestamptz
 }
 
-//Product
+model Yield {
+  id  String @id @default(uuid())
+  product YieldProduct
+  description String
+  quantity Int?
+  imageUrl String?
+  isHarvested Boolean @default(false)
 
-// GET /prediction/coffee
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  plantingTime DateTime @db.Timestamptz
+  harvestTime DateTime @db.Timestamptz
+
+  createdTime DateTime @default(now()) @db.Timestamptz
+  updatedTime DateTime @default(now()) @updatedAt @db.Timestamptz
+}
+
+model Transaction {
+  id  String @id @default(uuid())
+  amount Float
+  type TransactionType
+  category TransactionCategory
+  description String
+
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  transactionTime DateTime @db.Timestamptz
+
+  createdTime DateTime @default(now()) @db.Timestamptz
+  updatedTime DateTime @default(now()) @updatedAt @db.Timestamptz
+}
+
+enum YieldProduct {
+  nasi
+  kopi
+  jagung
+}
+
+enum TransactionType {
+  income
+  outcome
+}
+
+enum TransactionCategory {
+  a
+  b
+}
