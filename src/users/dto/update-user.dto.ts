@@ -1,16 +1,16 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
   @ApiProperty({ default: 'John' })
-  firstName: string;
+  name: string;
 
-  @IsString()
+  @IsEmail()
   @IsOptional()
-  @ApiProperty({ default: 'Snow' })
-  lastName: string;
+  @ApiProperty({ default: 'user@example.com' })
+  email: string;
 
   @IsString()
   @IsOptional()

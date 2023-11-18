@@ -9,10 +9,7 @@ export class UserEntity {
   email: string;
 
   @ApiProperty()
-  firstName: string;
-
-  @ApiProperty()
-  lastName: string;
+  name: string;
 
   @ApiProperty()
   imageUrl: string;
@@ -21,10 +18,10 @@ export class UserEntity {
   phoneNumber: string;
 
   @Exclude()
-  createdAt: Date;
+  createdTime: Date;
 
   @Exclude()
-  updatedAt: Date;
+  updatedTime: Date;
 
   @Exclude()
   password: string;

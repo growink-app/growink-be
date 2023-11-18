@@ -17,13 +17,7 @@ export class UsersService {
         where: {
           OR: [
             {
-              firstName: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-            {
-              lastName: {
+              name: {
                 contains: query,
                 mode: 'insensitive',
               },
@@ -64,8 +58,7 @@ export class UsersService {
         where: { id },
         data: {
           email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
+          name: data.name,
           imageUrl: data.imageUrl,
           phoneNumber: data.phoneNumber,
         },
