@@ -22,7 +22,8 @@ model User {
 
 model Yield {
   id           String       @id @default(uuid())
-  product      YieldProduct
+  productId    String
+  product      YieldProduct @relation(fields: [productId], references: [id])
   description  String
   quantity     Int?
   imageUrl     String?
@@ -33,6 +34,12 @@ model Yield {
   createdTime  DateTime     @default(now()) @db.Timestamptz(6)
   updatedTime  DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
   user         User         @relation(fields: [userId], references: [id])
+}
+
+model YieldProduct {
+  id           String       @id @default(uuid())
+  name         String       @unique
+  yields       Yield[] 
 }
 
 model Transaction {
@@ -55,11 +62,6 @@ model TransactionCategory {
   transactions    Transaction[]
 }
 
-enum YieldProduct {
-  nasi
-  kopi
-  jagung
-}
 
 enum TransactionType {
   income
