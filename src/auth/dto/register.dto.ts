@@ -22,12 +22,7 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   @ApiProperty({ default: 'John' })
-  firstName: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ default: 'Snow' })
-  lastName: string;
+  name: string;
 
   @IsString()
   @IsNotEmpty()
