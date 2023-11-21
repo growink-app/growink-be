@@ -51,8 +51,8 @@ model Transaction {
   transactionTime     DateTime            @db.Timestamptz(6)
   createdTime         DateTime            @default(now()) @db.Timestamptz(6)
   updatedTime         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
-  transactionId       String
-  transactionCategory TransactionCategory @relation(fields: [transactionId], references: [id])
+  transactionCategoryId       String?
+  transactionCategory TransactionCategory? @relation(fields: [transactionCategoryId], references: [id])
   user                User                @relation(fields: [userId], references: [id])
 }
 
@@ -63,6 +63,6 @@ model TransactionCategory {
 }
 
 enum TransactionType {
-  income
-  outcome
+  INCOME
+  EXPENSE
 }
