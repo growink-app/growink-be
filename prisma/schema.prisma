@@ -22,8 +22,6 @@ model User {
 
 model Yield {
   id           String       @id @default(uuid())
-  productId    String
-  product      YieldProduct @relation(fields: [productId], references: [id])
   description  String
   quantity     Int?
   imageUrl     String?
@@ -33,35 +31,36 @@ model Yield {
   harvestTime  DateTime     @db.Timestamptz(6)
   createdTime  DateTime     @default(now()) @db.Timestamptz(6)
   updatedTime  DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+  productId    String
+  product      YieldProduct @relation(fields: [productId], references: [id])
   user         User         @relation(fields: [userId], references: [id])
 }
 
 model YieldProduct {
-  id           String       @id @default(uuid())
-  name         String       @unique
-  yields       Yield[] 
+  id     String  @id @default(uuid())
+  name   String  @unique
+  yields Yield[]
 }
 
 model Transaction {
-  id              String              @id @default(uuid())
-  amount          Float
-  type            TransactionType
-  description     String
-  userId          String
-  user            User                @relation(fields: [userId], references: [id])
-  transactionId   String
+  id                  String              @id @default(uuid())
+  amount              Float
+  type                TransactionType
+  description         String
+  userId              String
+  transactionTime     DateTime            @db.Timestamptz(6)
+  createdTime         DateTime            @default(now()) @db.Timestamptz(6)
+  updatedTime         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+  transactionId       String
   transactionCategory TransactionCategory @relation(fields: [transactionId], references: [id])
-  transactionTime DateTime            @db.Timestamptz(6)
-  createdTime     DateTime            @default(now()) @db.Timestamptz(6)
-  updatedTime     DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+  user                User                @relation(fields: [userId], references: [id])
 }
 
 model TransactionCategory {
-  id              String              @id @default(uuid())
-  name            String
-  transactions    Transaction[]
+  id           String        @id @default(uuid())
+  name         String
+  transactions Transaction[]
 }
-
 
 enum TransactionType {
   income
