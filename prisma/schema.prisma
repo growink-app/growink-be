@@ -10,11 +10,11 @@ datasource db {
 model User {
   id           String        @id @default(uuid())
   email        String        @unique
-  name         String
   phoneNumber  String
-  imageUrl     String?
   password     String
+  imageUrl     String?
   createdTime  DateTime      @default(now()) @db.Timestamptz(6)
+  name         String
   updatedTime  DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
   transactions Transaction[]
   yields       Yield[]
@@ -57,9 +57,9 @@ model Transaction {
 }
 
 model TransactionCategory {
-  id           String        @id @default(uuid())
-  name         String
-  transactions Transaction[]
+  id          String        @id @default(uuid())
+  name        String
+  Transaction Transaction[]
 }
 
 enum TransactionType {
