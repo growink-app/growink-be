@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  ConflictException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { Yield } from '@prisma/client';
@@ -7,51 +12,116 @@ import { UpdateYieldDto } from './dto/update-yield.dto';
 
 @Injectable()
 export class YieldsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async createYield(createYieldDTO: CreateYieldDTO): Promise<Yield> {
-    const { product, plantTime, harvestTime, description, amount } =
-      createYieldDTO;
-    return this.prisma.yield.create({
-      data: {
-        product,
-        plantTime,
-        harvestTime,
-        description,
-        amount,
+  async getAllYields(userId: string): Promise<Yield[]> {
+    return this.prismaService.yield.findMany({
+      where: {
+        userId: userId,
       },
+      orderBy: [
+        {
+          plantingTime: 'desc',
+        },
+      ],
     });
   }
 
-  async getAllYields(): Promise<Yield[]> {
-    return this.prisma.yield.findMany();
-  }
-
-  async getYieldById(id: string): Promise<Yield> {
-    const yieldData = await this.prisma.yield.findUnique({
-      where: { id },
+  async getYieldById(yieldId: string, userId: string): Promise<Yield> {
+    const yieldData = await this.prismaService.yield.findUnique({
+      where: { id: yieldId },
     });
+
     if (!yieldData) {
       throw new NotFoundException('Yield not found');
     }
+
+    if (yieldData.userId !== userId) {
+      throw new ForbiddenException(
+        "You don't have permission to access this yield",
+      );
+    }
+
     return yieldData;
   }
 
+  async createYield(
+    createYieldDTO: CreateYieldDTO,
+    userId: string,
+  ): Promise<Yield> {
+    const {
+      productId,
+      plantingTime,
+      harvestTime,
+      description,
+      quantity,
+      imageUrl,
+      isHarvested,
+    } = createYieldDTO;
+
+    // const plantDate = new Date(plantingTime);
+    // const harvestDate = new Date(harvestTime);
+    // const diffInMonths =
+    //   (harvestDate.getFullYear() - plantDate.getFullYear()) * 12 +
+    //   (harvestDate.getMonth() - plantDate.getMonth());
+
+    // 2. time convert
+    // 3.
+
+    const newYield = await this.prismaService.yield.create({
+      data: {
+        userId,
+        productId,
+        plantingTime,
+        harvestTime,
+        description,
+        quantity,
+        imageUrl,
+        isHarvested,
+        // waitTimeToHarvest: diffInMonths,
+      },
+    });
+
+    return newYield;
+  }
+
   async updateYield(
-    id: string,
+    userId: string,
+    yieldId: string,
     updateYieldDTO: UpdateYieldDto,
   ): Promise<Yield> {
-    const yieldData = await this.getYieldById(id);
-    return this.prisma.yield.update({
-      where: { id },
+    const updatedYield = await this.getYieldById(yieldId, userId);
+
+    if (!updatedYield) {
+      throw new NotFoundException(`Yield with id: "${yieldId}" does not exist`);
+    }
+
+    if (updatedYield.userId !== userId) {
+      throw new ForbiddenException(
+        "You don't have permission to access this yield",
+      );
+    }
+
+    return this.prismaService.yield.update({
+      where: { id: yieldId },
       data: updateYieldDTO,
     });
   }
 
-  async deleteYield(id: string): Promise<void> {
-    const yieldData = await this.getYieldById(id);
-    await this.prisma.yield.delete({
-      where: { id },
+  async deleteYield(userId: string, yieldId: string): Promise<void> {
+    const deletedData = await this.getYieldById(yieldId, userId);
+
+    if (!deletedData) {
+      throw new NotFoundException(`Yield with id: "${yieldId}" does not exist`);
+    }
+
+    if (deletedData.userId !== userId) {
+      throw new ForbiddenException(
+        "You don't have permission to access this yield",
+      );
+    }
+    await this.prismaService.yield.delete({
+      where: { id: yieldId },
     });
   }
 }

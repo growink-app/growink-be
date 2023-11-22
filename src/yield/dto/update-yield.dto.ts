@@ -5,42 +5,44 @@ import {
   Min,
   IsDate,
   IsDateString,
+  IsBoolean,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateYieldDto {
   @IsOptional()
   @IsString()
-  product?: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ default: 'Strawberry in Spring' })
-  description?: string;
-
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  @ApiProperty({ default: '300' })
-  quantity?: number;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ default: 'yourimage.com' })
-  imageUrl?: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ default: 'false' })
-  isHarvested?: boolean;
+  @ApiProperty({ default: 'StrawberryID' })
+  productId: string;
 
   @IsOptional()
   @IsDateString()
   @ApiProperty({ default: '2023-11-21T00:00:00.000Z' })
-  plantingTime?: Date;
+  plantingTime: string;
 
-  @IsDateString()
   @IsOptional()
+  @IsDateString()
   @ApiProperty({ default: '2023-12-21T00:00:00.000Z' })
-  harvestTime?: Date;
+  harvestTime: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ default: 'Describe your product' })
+  description: string;
+
+  @IsOptional()
+  @Min(0)
+  @IsNumber()
+  @ApiProperty({ default: '500' })
+  quantity: number;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ default: 'yourimage.com' })
+  imageUrl: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ default: 'false' })
+  isHarvested: boolean;
 }

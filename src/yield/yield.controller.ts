@@ -2,44 +2,81 @@ import {
   Controller,
   Get,
   Post,
-  Patch,
+  Put,
   Delete,
+  Request,
   Body,
   Param,
+  Query,
+  UseGuards,
+  Patch,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { YieldsService } from './yield.service';
 import { CreateYieldDTO } from './dto/create-yield.dto';
 import { UpdateYieldDto } from './dto/update-yield.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ProductsService } from 'src/products/products.service';
 
 @Controller('yields')
+@ApiTags('yields')
 export class YieldsController {
-  constructor(private readonly yieldsService: YieldsService) {}
+  constructor(
+    private yieldsService: YieldsService,
+    private productsService: ProductsService,
+  ) {}
 
-  @Post()
-  async createYield(@Body() createYieldDTO: CreateYieldDTO) {
-    return this.yieldsService.createYield(createYieldDTO);
+  @Get('products')
+  async getAllProducts() {
+    return this.productsService.getAllProducts();
   }
 
   @Get()
-  async getAllYields() {
-    return this.yieldsService.getAllYields();
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getAllYields(@Request() req) {
+    const userId = req.user.id;
+    return this.yieldsService.getAllYields(userId);
   }
 
   @Get(':id')
-  async getYieldById(@Param('id') id: string) {
-    return this.yieldsService.getYieldById(id);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getYieldById(@Request() req, @Param('id') yieldId: string) {
+    const userId = req.user.id;
+    return this.yieldsService.getYieldById(yieldId, userId);
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async createYield(@Request() req, @Body() createYieldDTO: CreateYieldDTO) {
+    const userId = req.user.id;
+    return await this.yieldsService.createYield(createYieldDTO, userId);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async updateYield(
-    @Param('id') id: string,
+    @Request() req,
+    @Param('id') yieldId: string,
     @Body() updateYieldDTO: UpdateYieldDto,
   ) {
-    return this.yieldsService.updateYield(id, updateYieldDTO);
+    const userId = req.user.id;
+    return this.yieldsService.updateYield(userId, yieldId, updateYieldDTO);
   }
 
   @Delete(':id')
-  async deleteYield(@Param('id') id: string) {
-    return this.yieldsService.deleteYield(id);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async deleteYield(@Request() req, @Param('id') yieldId: string) {
+    const userId = req.user.id;
+    return this.yieldsService.deleteYield(userId, yieldId);
   }
 }
