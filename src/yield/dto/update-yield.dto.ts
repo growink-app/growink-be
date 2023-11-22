@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsEmail } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  Min,
+  IsDate,
+  IsDateString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateYieldDto {
@@ -11,7 +18,8 @@ export class UpdateYieldDto {
   @ApiProperty({ default: 'Strawberry in Spring' })
   description?: string;
 
-  @IsString()
+  @IsNumber()
+  @Min(0)
   @IsOptional()
   @ApiProperty({ default: '300' })
   quantity?: number;
@@ -26,13 +34,13 @@ export class UpdateYieldDto {
   @ApiProperty({ default: 'false' })
   isHarvested?: boolean;
 
-  @IsEmail()
   @IsOptional()
-  @ApiProperty({ default: '30-nov-2020' })
+  @IsDateString()
+  @ApiProperty({ default: '2023-11-21T00:00:00.000Z' })
   plantingTime?: Date;
 
-  @IsString()
+  @IsDateString()
   @IsOptional()
-  @ApiProperty({ default: '30-nov-2021' })
+  @ApiProperty({ default: '2023-12-21T00:00:00.000Z' })
   harvestTime?: Date;
 }
