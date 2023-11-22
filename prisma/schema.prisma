@@ -10,11 +10,11 @@ datasource db {
 model User {
   id           String        @id @default(uuid())
   email        String        @unique
-  name         String
   phoneNumber  String
-  imageUrl     String?
   password     String
+  imageUrl     String?
   createdTime  DateTime      @default(now()) @db.Timestamptz(6)
+  name         String
   updatedTime  DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
   transactions Transaction[]
   yields       Yield[]
@@ -43,26 +43,26 @@ model YieldProduct {
 }
 
 model Transaction {
-  id                  String              @id @default(uuid())
-  amount              Float
-  type                TransactionType
-  description         String
-  userId              String
-  transactionTime     DateTime            @db.Timestamptz(6)
-  createdTime         DateTime            @default(now()) @db.Timestamptz(6)
-  updatedTime         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
-  transactionId       String
-  transactionCategory TransactionCategory @relation(fields: [transactionId], references: [id])
-  user                User                @relation(fields: [userId], references: [id])
+  id                    String               @id @default(uuid())
+  amount                Float
+  type                  TransactionType
+  description           String
+  userId                String
+  transactionTime       DateTime             @db.Timestamptz(6)
+  createdTime           DateTime             @default(now()) @db.Timestamptz(6)
+  updatedTime           DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
+  transactionCategoryId String?
+  TransactionCategory   TransactionCategory? @relation(fields: [transactionCategoryId], references: [id])
+  user                  User                 @relation(fields: [userId], references: [id])
 }
 
 model TransactionCategory {
-  id           String        @id @default(uuid())
-  name         String
-  transactions Transaction[]
+  id          String        @id @default(uuid())
+  name        String
+  Transaction Transaction[]
 }
 
 enum TransactionType {
-  income
-  outcome
+  INCOME
+  EXPENSE
 }
