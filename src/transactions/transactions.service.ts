@@ -18,6 +18,11 @@ export class TransactionsService {
           userId: userId,
           type: transactionType,
         },
+        orderBy: [
+          {
+            transactionTime: 'desc',
+          },
+        ],
         include: {
           transactionCategory: true,
         },
@@ -28,6 +33,11 @@ export class TransactionsService {
         where: {
           userId: userId,
         },
+        orderBy: [
+          {
+            transactionTime: 'desc',
+          },
+        ],
         include: {
           transactionCategory: true,
         },
