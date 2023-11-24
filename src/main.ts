@@ -14,8 +14,10 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'https://localhost:3000',
-      'http://growink-api.up.railway.app/',
-      'https://growink-api.up.railway.app/',
+      'http://growink-api.up.railway.app',
+      'https://growink-api.up.railway.app',
+      'http://growink.vercel.app',
+      'https://growink.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
