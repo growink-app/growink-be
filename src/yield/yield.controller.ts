@@ -44,6 +44,15 @@ export class YieldsController {
     return this.yieldsService.getAllYields(userId);
   }
 
+  @Get('statistics/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getYieldStatistics(@Request() req) {
+    const userId = req.user.id;
+    const yieldStatistics = await this.yieldsService.getYieldStatistics(userId);
+    return yieldStatistics;
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
