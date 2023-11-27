@@ -24,12 +24,18 @@ export class YieldsService {
           plantingTime: 'desc',
         },
       ],
+      include: {
+        product: true,
+      },
     });
   }
 
   async getYieldById(yieldId: string, userId: string): Promise<Yield> {
     const yieldData = await this.prismaService.yield.findUnique({
       where: { id: yieldId },
+      include: {
+        product: true,
+      },
     });
 
     if (!yieldData) {
