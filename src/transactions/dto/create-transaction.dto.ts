@@ -2,6 +2,7 @@ import {
   IsString,
   IsNumber,
   IsNotEmpty,
+  IsOptional,
   Min,
   IsEnum,
   IsDate,
@@ -32,7 +33,7 @@ export class CreateTransactionDto {
   description: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({ default: 'categoryId' })
   transactionCategoryId: string;
 
