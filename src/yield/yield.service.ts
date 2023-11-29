@@ -51,27 +51,30 @@ export class YieldsService {
     return yieldData;
   }
 
-  async getYieldStatistics(userId: string): Promise<{ [key: string]: number }> {
+  async getAllYieldStatistics(
+    userId: string,
+  ): Promise<{ [key: string]: number }> {
     const userYields = await this.prismaService.yield.findMany({
       where: {
         userId: userId,
       },
       select: {
         productId: true,
+        quantity: true,
       },
     });
 
-    const yieldCountMap: { [key: string]: number } = {};
+    const yieldQuantityMap: { [key: string]: number } = {};
 
     userYields.forEach((yieldItem) => {
-      if (yieldCountMap[yieldItem.productId]) {
-        yieldCountMap[yieldItem.productId]++;
+      if (yieldQuantityMap[yieldItem.productId]) {
+        yieldQuantityMap[yieldItem.productId] += yieldItem.quantity || 0;
       } else {
-        yieldCountMap[yieldItem.productId] = 1;
+        yieldQuantityMap[yieldItem.productId] = yieldItem.quantity || 0;
       }
     });
 
-    return yieldCountMap;
+    return yieldQuantityMap;
   }
 
   async createYield(
