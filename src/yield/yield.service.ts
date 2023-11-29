@@ -77,6 +77,39 @@ export class YieldsService {
     return yieldQuantityMap;
   }
 
+  async getMonthlyStatistics(
+    userId: string,
+    month: number,
+  ): Promise<{ [key: string]: number }> {
+    const userYields = await this.prismaService.yield.findMany({
+      where: {
+        userId,
+        AND: {
+          harvestTime: {
+            gte: new Date(2023, month - 1, 1),
+            lt: new Date(2023, month, 1),
+          },
+        },
+      },
+      select: {
+        productId: true,
+        quantity: true,
+      },
+    });
+
+    const monthlyStatistics: { [key: string]: number } = {};
+
+    userYields.forEach((yieldItem) => {
+      if (monthlyStatistics[yieldItem.productId]) {
+        monthlyStatistics[yieldItem.productId] += yieldItem.quantity || 0;
+      } else {
+        monthlyStatistics[yieldItem.productId] = yieldItem.quantity || 0;
+      }
+    });
+
+    return monthlyStatistics;
+  }
+
   async createYield(
     createYieldDTO: CreateYieldDTO,
     userId: string,
