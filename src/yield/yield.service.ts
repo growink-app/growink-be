@@ -79,6 +79,7 @@ export class YieldsService {
 
   async getMonthlyStatistics(
     userId: string,
+    year: number,
     month: number,
   ): Promise<{ [key: string]: number }> {
     const userYields = await this.prismaService.yield.findMany({
@@ -86,8 +87,8 @@ export class YieldsService {
         userId,
         AND: {
           harvestTime: {
-            gte: new Date(2023, month - 1, 1),
-            lt: new Date(2023, month, 1),
+            gte: new Date(year, month - 1, 1),
+            lt: new Date(year, month, 1),
           },
         },
       },
@@ -124,15 +125,6 @@ export class YieldsService {
       isHarvested,
     } = createYieldDTO;
 
-    // const plantDate = new Date(plantingTime);
-    // const harvestDate = new Date(harvestTime);
-    // const diffInMonths =
-    //   (harvestDate.getFullYear() - plantDate.getFullYear()) * 12 +
-    //   (harvestDate.getMonth() - plantDate.getMonth());
-
-    // 2. time convert
-    // 3.
-
     const newYield = await this.prismaService.yield.create({
       data: {
         userId,
@@ -143,7 +135,6 @@ export class YieldsService {
         quantity,
         imageUrl,
         isHarvested,
-        // waitTimeToHarvest: diffInMonths,
       },
     });
 

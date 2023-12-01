@@ -44,7 +44,7 @@ export class YieldsController {
     return this.yieldsService.getAllYields(userId);
   }
 
-  @Get('statistics/:userId')
+  @Get('statistics1')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async getAllYieldStatistics(@Request() req) {
@@ -55,13 +55,18 @@ export class YieldsController {
     return yieldStatistics;
   }
 
-  @Get('statistics/:userId/month/:month')
+  @Get('statistics/:year/:month')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async getMonthlyStatistics(@Request() req, @Param('month') month: number) {
+  async getMonthlyStatistics(
+    @Request() req,
+    @Param('year') year: number,
+    @Param('month') month: number,
+  ) {
     const userId = req.user.id;
     const monthlyStats = await this.yieldsService.getMonthlyStatistics(
       userId,
+      year,
       month,
     );
     return monthlyStats;
