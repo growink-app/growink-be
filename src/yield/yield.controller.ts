@@ -44,7 +44,7 @@ export class YieldsController {
     return this.yieldsService.getAllYields(userId);
   }
 
-  @Get('statistics1')
+  @Get('statistics')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async getAllYieldStatistics(@Request() req) {
