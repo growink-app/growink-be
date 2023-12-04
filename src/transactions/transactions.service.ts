@@ -164,4 +164,102 @@ export class TransactionsService {
       throw new Error(`Unable to delete transaction: ${error.message}`);
     }
   }
+
+  async getMonthlyStatistics(
+    userId: string,
+  ): Promise<{ monthlyStatistics: MonthlyStatistic[] }> {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+
+    const monthlyStatistics: MonthlyStatistic[] = [];
+
+    for (let i = 0; i < 3; i++) {
+      const year = currentMonth - i <= 0 ? currentYear - 1 : currentYear;
+      const month = (currentMonth - i + 12) % 12 || 12;
+
+      const startOfMonth = new Date(year, month - 1, 1);
+      const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+      const transactions = await this.prismaService.transaction.findMany({
+        where: {
+          userId: userId,
+          transactionTime: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
+        },
+        include: {
+          transactionCategory: true,
+        },
+      });
+
+      const monthlyIncome = { totalAmount: 0 };
+      const monthlyExpense = { totalAmount: 0, categories: [] };
+
+      transactions.forEach((transaction) => {
+        const type = transaction.type;
+
+        if (type === 'INCOME') {
+          const amount = transaction.amount;
+          monthlyIncome.totalAmount += amount;
+        } else {
+          const amount = transaction.amount;
+          const category = transaction.transactionCategory?.name ?? '';
+
+          monthlyExpense.totalAmount += amount;
+
+          const existingCategory = monthlyExpense.categories.find(
+            (c) => c.name === category,
+          );
+
+          if (existingCategory) {
+            existingCategory.totalAmount += transaction.amount;
+          } else {
+            monthlyExpense.categories.push({
+              name: category,
+              totalAmount: amount,
+            });
+          }
+        }
+      });
+
+      monthlyStatistics.push({
+        month: this.getMonthName(month),
+        income: monthlyIncome,
+        expense: monthlyExpense,
+      });
+    }
+
+    return { monthlyStatistics };
+  }
+
+  private getMonthName(month: number): string {
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return monthNames[month - 1];
+  }
+}
+
+export interface MonthlyStatistic {
+  month: string;
+  income: { totalAmount: number };
+  expense: { totalAmount: number; categories: MonthlyCategory[] };
+}
+
+interface MonthlyCategory {
+  name: string;
+  totalAmount: number;
 }
