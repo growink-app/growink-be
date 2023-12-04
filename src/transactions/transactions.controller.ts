@@ -92,4 +92,12 @@ export class TransactionsController {
     );
     //return new UserEntity(await this.usersService.update(id, updateUserDto));
   }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async delete(@Request() req, @Param('id') transactionId: string) {
+    const userId = req.user.id;
+    return this.transactionsService.delete(transactionId, userId);
+  }
 }

@@ -137,4 +137,31 @@ export class TransactionsService {
       throw error;
     }
   }
+
+  async delete(transactionId: string, userId: string) {
+    const transaction = await this.prismaService.transaction.findUnique({
+      where: { id: transactionId },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException(
+        `Transaction with id: "${transactionId}" does not exist`,
+      );
+    }
+
+    if (transaction.userId !== userId) {
+      throw new ForbiddenException(
+        "You don't have permission to delete this transaction",
+      );
+    }
+
+    try {
+      await this.prismaService.transaction.delete({
+        where: { id: transactionId },
+      });
+      return { message: 'Transaction deleted successfully' };
+    } catch (error) {
+      throw new Error(`Unable to delete transaction: ${error.message}`);
+    }
+  }
 }
