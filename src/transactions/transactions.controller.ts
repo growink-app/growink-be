@@ -25,6 +25,7 @@ import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { TransactionType } from '@prisma/client';
 import { CategoriesService } from './categories.service';
+import { MonthlyStatistic } from './transactions.service';
 
 @Controller('transactions')
 @ApiTags('transactions')
@@ -100,4 +101,16 @@ export class TransactionsController {
     const userId = req.user.id;
     return this.transactionsService.delete(transactionId, userId);
   }
+
+  @Get('statistics/summary')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getStatistics(@Request() req) {
+    const userId = req.user.id;
+    return await this.transactionsService.getMonthlyStatistics(userId);
+  }
 }
+
+// todos:
+// 1. time filter
+// 2. handle invalid category id
