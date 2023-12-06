@@ -26,6 +26,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { TransactionType } from '@prisma/client';
 import { CategoriesService } from './categories.service';
 import { MonthlyStatistic } from './transactions.service';
+import { GetTransactionsDto } from './dto/get-transaction.dto';
 
 @Controller('transactions')
 @ApiTags('transactions')
@@ -49,9 +50,18 @@ export class TransactionsController {
     type: String,
     description: 'Search transactions by type',
   })
-  async findAll(@Request() req, @Query('type') type?: TransactionType) {
+  async findAll(
+    @Request() req,
+    @Query('type') type?: TransactionType,
+    @Body()
+    filterDto?: GetTransactionsDto,
+  ) {
     const userId = req.user.id;
-    const transactions = await this.transactionsService.findAll(userId, type);
+    const transactions = await this.transactionsService.findAll(
+      userId,
+      type,
+      filterDto.timeFilter,
+    );
     return transactions;
     //return users.map((user) => new UserEntity(user));
   }

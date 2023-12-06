@@ -6,44 +6,59 @@ import {
 } from '@nestjs/common';
 import { Prisma, TransactionType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { GetTransactionsDto, TimeFilterDto } from './dto/get-transaction.dto';
 
 @Injectable()
 export class TransactionsService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAll(userId: string, transactionType: TransactionType) {
+  async findAll(
+    userId: string,
+    transactionType: TransactionType,
+    timeFilter: TimeFilterDto,
+  ) {
+    const whereClause: {
+      userId: string;
+      type?: TransactionType;
+      transactionTime?: {
+        gte?: string;
+        lte?: string;
+      };
+    } = {
+      userId,
+    };
+
     if (transactionType) {
-      const transactions = await this.prismaService.transaction.findMany({
-        where: {
-          userId: userId,
-          type: transactionType,
-        },
-        orderBy: [
-          {
-            transactionTime: 'desc',
-          },
-        ],
-        include: {
-          transactionCategory: true,
-        },
-      });
-      return transactions;
-    } else {
-      const transactions = await this.prismaService.transaction.findMany({
-        where: {
-          userId: userId,
-        },
-        orderBy: [
-          {
-            transactionTime: 'desc',
-          },
-        ],
-        include: {
-          transactionCategory: true,
-        },
-      });
-      return transactions;
+      whereClause.type = transactionType;
     }
+
+    if (timeFilter && timeFilter.gte) {
+      whereClause.transactionTime = {
+        ...(whereClause.transactionTime || {}),
+        gte: timeFilter.gte,
+      };
+    }
+
+    if (timeFilter && timeFilter.lte) {
+      whereClause.transactionTime = {
+        ...(whereClause.transactionTime || {}),
+        lte: timeFilter.lte,
+      };
+    }
+
+    const transactions = await this.prismaService.transaction.findMany({
+      where: whereClause,
+      orderBy: [
+        {
+          transactionTime: 'desc',
+        },
+      ],
+      include: {
+        transactionCategory: true,
+      },
+    });
+
+    return transactions;
   }
 
   async findOne(transactionId: string, userId: string) {
